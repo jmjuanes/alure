@@ -1,5 +1,5 @@
 {
-    "name": "floator",
+    "name": "alure",
     "version": "0.0.0",
     "description": "Composable floating elements for React",
     "author": {
@@ -7,8 +7,8 @@
         "email": "hello@josemi.xyz"
     },
     "license": "MIT",
-    "repository": "https://github.com/jmjuanes/floator",
-    "bugs": "https://github.com/jmjuanes/floator/issues",
+    "repository": "https://github.com/jmjuanes/alure",
+    "bugs": "https://github.com/jmjuanes/alure/issues",
     "type": "module",
     "main": "index.js",
     "types": "./index.d.ts",
@@ -19,6 +19,8 @@
         "./package.json": "./package.json"
     },
     "scripts": {
+        "build": "tsc",
+        "test": "jest"
     },
     "keywords": [
         "react",

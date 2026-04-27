@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
+        "declaration": true,
         "target": "esnext",
-        "useDefineForClassFields": true,
         "module": "esnext",
         "skipLibCheck": true,
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "noEmit": true,
         "jsx": "react-jsx",
         "strict": true,
         "noUnusedLocals": true,
@@ -24,6 +22,7 @@
     ],
     "exclude": [
         "node_modules/**/*",
-        "**/*.js"
+        "**/*.js",
+        "**/*.test.tsx"
     ]
 }
