@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { render, screen, act } from "@testing-library/react";
-import { AlureProvider, AlureOutlet, useAlure } from "./index.tsx";
+import {
+    AlureProvider,
+    AlureOutlet,
+    useAlure,
+    withFixedPosition,
+} from "./index.tsx";
 import "@testing-library/jest-dom";
 import type { PropsWithChildren } from "react";
 
@@ -110,26 +115,47 @@ describe("Alure", () => {
             );
         });
 
-        it("should support adding custom middlewares", () => {
-            const customMiddleware = {
-                wrapper: (props: PropsWithChildren) => {
-                    return (
-                        <div data-testid="test-middleware">
-                            {props.children}
-                        </div>
-                    );
-                },
-            };
+        describe("custom middlewares", () => {
+            it("should support adding custom middlewares", () => {
+                const customMiddleware = {
+                    wrapper: (props: PropsWithChildren) => {
+                        return (
+                            <div data-testid="test-middleware">
+                                {props.children}
+                            </div>
+                        );
+                    },
+                };
 
-            act(() => {
-                alureManager.open("text-id", {
-                    component: TestComponent,
-                    middlewares: [customMiddleware],
+                act(() => {
+                    alureManager.open("text-id", {
+                        component: TestComponent,
+                        middlewares: [customMiddleware],
+                    });
                 });
-            });
 
-            expect(screen.getByTestId("test-element")).toBeInTheDocument();
-            expect(screen.getByTestId("test-middleware")).toBeInTheDocument();
+                expect(screen.getByTestId("test-element")).toBeInTheDocument();
+                expect(screen.getByTestId("test-middleware")).toBeInTheDocument();
+            });
+        });
+
+        describe("withFixedPosition", () => {
+            it("should include the provided position as CSS style", () => {
+                act(() => {
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withFixedPosition({
+                                top: 100,
+                                left: 100,
+                            }),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("alure:middleware:fixed-position").style.top).toEqual("100px");
+                expect(screen.getByTestId("alure:middleware:fixed-position").style.left).toEqual("100px");
+                expect(screen.getByTestId("alure:middleware:fixed-position").style.position).toEqual("fixed");
+            });
         });
     });
 });

@@ -1,6 +1,20 @@
-import { createElement, createContext, useContext, useState, useCallback, Fragment } from "react";
+import {
+    createElement,
+    createContext,
+    useContext,
+    useState,
+    useCallback,
+    Fragment,
+} from "react";
 // import { createPortal } from "react-dom";
-import type { JSX, ElementType, PropsWithChildren, ComponentType, ReactNode } from "react";
+import type {
+    JSX,
+    ElementType,
+    PropsWithChildren,
+    ComponentType,
+    ReactNode,
+    CSSProperties,
+} from "react";
 
 // @description to generate the composition tree from an array of React components
 // @param {array} components An array of React components to build the tree
@@ -116,4 +130,30 @@ export const AlureOutlet = (): JSX.Element => {
             })}
         </Fragment>
     );
+};
+
+// @description middleware to set a custom position for the floating element
+export const withFixedPosition = (
+    options: {
+        top: number | string;
+        left: number | string;
+        className?: string;
+        style?: CSSProperties;
+    },
+): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            const style: CSSProperties = {
+                top: typeof options.top === "number" ? options.top + "px" : options.top,
+                left: typeof options.left === "number" ? options.left + "px" : options.left,
+                position: "fixed",
+                ...options.style,
+            };
+            return (
+                <div data-testid="alure:middleware:fixed-position" className={options.className} style={style}>
+                    {props.children}
+                </div>
+            );
+        },
+    };
 };
