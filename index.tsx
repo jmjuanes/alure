@@ -1,14 +1,36 @@
-import { createContext, useContext, useState, useCallback, Fragment } from "react";
-// import { createPortal } from "react-dom";
-import type { JSX, ElementType, PropsWithChildren } from "react";
+import {
+    createElement,
+    createContext,
+    useContext,
+    useState,
+    useCallback,
+    Fragment,
+} from "react";
+import { createPortal } from "react-dom";
+import type {
+    JSX,
+    ElementType,
+    PropsWithChildren,
+    ComponentType,
+    ReactNode,
+    CSSProperties,
+} from "react";
 
-// const composeTree = (components: ComponentType[], children: ReactNode): JSX.Element => {
-//     return (components || []).reduceRight((acc, Component) => createElement(Component, null, acc), children) as JSX.Element;
-// };
+// @description to generate the composition tree from an array of React components
+// @param {array} components An array of React components to build the tree
+// @param {ReactNode} children The children content of the tree
+const composeTree = (components: ComponentType[], children: ReactNode): JSX.Element => {
+    return (components || []).reduceRight((acc, Comp) => createElement(Comp, null, acc), children) as JSX.Element;
+};
+
+export type AlureMiddleware = {
+    wrapper?: ComponentType;
+};
 
 export type AlureElement = {
     id: string;
     component: ElementType;
+    middlewares?: AlureMiddleware[];
 };
 
 export type AlureManager = {
@@ -78,9 +100,13 @@ export const AlureProvider = (props: PropsWithChildren): JSX.Element => {
 // internal wrapper to access to managers for the alure elements
 const AlureElementWrapper = (props: { element: AlureElement }): JSX.Element => {
     const Component: ElementType = props.element.component;
+    const middlewaresComponents: ComponentType[] = (props.element.middlewares || [])
+        .filter((middleware: AlureMiddleware) => !!middleware.wrapper)
+        .map((middleware: AlureMiddleware) => middleware.wrapper as ComponentType);
+
     return (
         <AlureElementContext.Provider value={props.element}>
-            <Component />
+            {composeTree(middlewaresComponents, <Component />)}
         </AlureElementContext.Provider>
     );
 };
@@ -104,4 +130,44 @@ export const AlureOutlet = (): JSX.Element => {
             })}
         </Fragment>
     );
+};
+
+// @description middleware to set a custom position for the floating element
+export const withFixedPosition = (
+    options: {
+        top: number | string;
+        left: number | string;
+        className?: string;
+        style?: CSSProperties;
+        testid?: string;
+    },
+): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            const style: CSSProperties = {
+                top: typeof options.top === "number" ? options.top + "px" : options.top,
+                left: typeof options.left === "number" ? options.left + "px" : options.left,
+                position: "fixed",
+                ...options.style,
+            };
+            return (
+                <div data-testid={options.testid} className={options.className} style={style}>
+                    {props.children}
+                </div>
+            );
+        },
+    };
+};
+
+// @description middleware to display the floating element in a portal
+export const withPortal = (
+    options?: {
+        target?: HTMLElement,
+    },
+): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            return createPortal([<>{props.children}</>], options?.target ?? document.body);
+        },
+    };
 };

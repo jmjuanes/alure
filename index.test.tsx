@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 import { render, screen, act } from "@testing-library/react";
-import { AlureProvider, AlureOutlet, useAlure } from "./index.tsx";
+import {
+    AlureProvider,
+    AlureOutlet,
+    useAlure,
+    withFixedPosition,
+    withPortal,
+} from "./index.tsx";
 import "@testing-library/jest-dom";
+import type { PropsWithChildren } from "react";
 
 const TestComponent = () => {
     return (
@@ -94,6 +101,77 @@ describe("Alure", () => {
                     alureManager.open("test-id", {});
                 });
             }).toThrow("Cannot display alure element without 'component'");
+        });
+    });
+
+    describe("middlewares", () => {
+        let alureManager: any;
+
+        beforeEach(() => {
+            render(
+                <AlureProvider>
+                    <HookCaller onMount={(m) => { alureManager = m; }} />
+                    <AlureOutlet />
+                </AlureProvider>
+            );
+        });
+
+        describe("custom middlewares", () => {
+            it("should support adding custom middlewares", () => {
+                const customMiddleware = {
+                    wrapper: (props: PropsWithChildren) => {
+                        return (
+                            <div data-testid="test-middleware">
+                                {props.children}
+                            </div>
+                        );
+                    },
+                };
+
+                act(() => {
+                    alureManager.open("text-id", {
+                        component: TestComponent,
+                        middlewares: [customMiddleware],
+                    });
+                });
+
+                expect(screen.getByTestId("test-element")).toBeInTheDocument();
+                expect(screen.getByTestId("test-middleware")).toBeInTheDocument();
+            });
+        });
+
+        describe("withFixedPosition", () => {
+            it("should include the provided position as CSS style", () => {
+                act(() => {
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withFixedPosition({
+                                top: 100,
+                                left: 100,
+                                testid: "middleware:fixed-position",
+                            }),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("middleware:fixed-position").style.top).toEqual("100px");
+                expect(screen.getByTestId("middleware:fixed-position").style.left).toEqual("100px");
+                expect(screen.getByTestId("middleware:fixed-position").style.position).toEqual("fixed");
+            });
+        });
+
+        describe("withPortal", () => {
+            it("should display content in the document", () => {
+                act(() =>{
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withPortal(),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("test-element")).toBeInTheDocument();
+            });
         });
     });
 });
