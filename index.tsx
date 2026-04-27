@@ -1,97 +1,103 @@
-import { createElement, createContext, useContext, useState, useCallback, Fragment } from "react";
+import { createContext, useContext, useState, useCallback, Fragment } from "react";
 // import { createPortal } from "react-dom";
-import type { ReactNode, JSX, ComponentType, ElementType, PropsWithChildren, CSSProperties } from "react";
+import type { JSX, ElementType, PropsWithChildren } from "react";
 
 // const composeTree = (components: ComponentType[], children: ReactNode): JSX.Element => {
 //     return (components || []).reduceRight((acc, Component) => createElement(Component, null, acc), children) as JSX.Element;
 // };
 
-export type FloatingElement = {
+export type AlureElement = {
     id: string;
     component: ElementType;
 };
 
-export type FloatorManager = {
-    showFloatingElement: (id: string, element: Partial<FloatingElement>) => void;
-    removeFloatingElement: (id?: string) => void;
-    removeAllFloatingElements: () => void;
+export type AlureManager = {
+    open: (id: string, element: Partial<AlureElement>) => void;
+    close: (id?: string) => void;
+    closeAll: () => void;
 };
 
-const FloatingContext = createContext(null);
-const FloatingElementContext = createContext<FloatingElement | null>(null);
+type AlureContextValue = {
+    elements: AlureElement[];
+    setElements: (update: (prev: AlureElement[]) => AlureElement[]) => void;
+};
 
-// @description hook to access to floating manager
-// @returns {object} floating object
-// @returns {function} floating.showFloatingElement function to show a floating element
-// @returns {function} surface.removeFloatingElement function to remove a floating element
-export const useFloator = (): FloatorManager => {
-    const { elements, setElements } = useContext(FloatingContext) || { elements: null, setElements: null };
-    // const { id, context } = useContext(FloatingElementContext) || { id: null, context: null };
-    if (!elements || !setElements) {
-        throw new Error("Cannot call 'useFloator' outside FloatorProvider");
+const AlureContext = createContext<AlureContextValue | null>(null);
+const AlureElementContext = createContext<AlureElement | null>(null);
+
+// @description hook to access to alure manager
+// @returns {object} alure object
+// @returns {function} alure.open function to show an alure element
+// @returns {function} alure.close function to remove an alure element
+export const useAlure = (): AlureManager => {
+    const context = useContext(AlureContext);
+    if (!context) {
+        throw new Error("Cannot call 'useAlure' outside AlureProvider");
     }
 
-    // callback to show a floating element
-    const showFloatingElement = useCallback((elementId: string, element: Partial<FloatingElement>) => {
+    const { setElements } = context;
+
+    // callback to show an alure element
+    const open = useCallback((elementId: string, element: Partial<AlureElement>) => {
         if (!element.component) {
-            throw new Error("Cannot display floating element without 'component'");
+            throw new Error("Cannot display alure element without 'component'");
         }
-        setElements((prevElements: FloatingElement[]) => {
+        setElements((prevElements: AlureElement[]) => {
             return [
                 ...prevElements,
-                Object.assign({}, element, { id: elementId }) as FloatingElement,
+                Object.assign({}, element, { id: elementId }) as AlureElement,
             ];
         });
     }, [setElements]);
 
-    // callback to remove the provided floating element
-    const removeFloatingElement = useCallback((elementId?: string) => {
-        setElements((prevElements: FloatingElement[]) => {
+    // callback to remove the provided alure element
+    const close = useCallback((elementId?: string) => {
+        setElements((prevElements: AlureElement[]) => {
             return prevElements.filter(element => element.id !== elementId);
         });
     }, [setElements]);
 
-    // callback to clear all floating elements
-    const removeAllFloatingElements = useCallback(() => setElements([] as FloatingElement[]), [setElements]);
+    // callback to clear all alure elements
+    const closeAll = useCallback(() => setElements(() => [] as AlureElement[]), [setElements]);
 
-    return { showFloatingElement, removeFloatingElement, removeAllFloatingElements };
+    return { open, close, closeAll };
 };
 
 // @description main component
 // @param {object} props React props
 // @param {React Children} props.children React children to render
-export const Floator = (props: PropsWithChildren): JSX.Element => {
-    const [elements, setElements] = useState<FloatingElement[]>([] as FloatingElement[]);
-
+export const AlureProvider = (props: PropsWithChildren): JSX.Element => {
+    const [elements, setElements] = useState<AlureElement[]>([] as AlureElement[]);
     return (
-        <FloatingContext.Provider value={{ elements, setElements }}>
+        <AlureContext.Provider value={{ elements, setElements }}>
             {props.children}
-        </FloatingContext.Provider>
+        </AlureContext.Provider>
     );
 };
 
-// internal wrapper to access to managers for the floating elements
-const FloatingElementWrapper = (props: { element: FloatingElement }): JSX.Element => {
+// internal wrapper to access to managers for the alure elements
+const AlureElementWrapper = (props: { element: AlureElement }): JSX.Element => {
     const Component: ElementType = props.element.component;
     return (
-        <FloatingElementContext.Provider value={props.element}>
+        <AlureElementContext.Provider value={props.element}>
             <Component />
-        </FloatingElementContext.Provider>
+        </AlureElementContext.Provider>
     );
 };
 
-// export component to render content of the floating elements
-export const FloatorSlot = (): JSX.Element => {
-    const { elements } = useContext(FloatingContext) || { elements: null };
-    if (!elements) {
-        throw new Error("Component FloatorSlot can not be used outside <Floator>");
+// export component to render content of the alure elements
+export const AlureOutlet = (): JSX.Element => {
+    const context = useContext(AlureContext);
+    if (!context) {
+        throw new Error("Component AlureOutlet can not be used outside <AlureProvider>");
     }
+    const { elements } = context;
     return (
         <Fragment>
-            {(elements || []).map((element: FloatingElement, index: number) => {
+            {(elements || []).map((element: AlureElement, index: number) => {
                 return (
-                    <FloatingElementWrapper
-                        key={`floating:${index}:${element.id}`}
+                    <AlureElementWrapper
+                        key={`alure:${index}:${element.id}`}
                         element={element}
                     />
                 );
