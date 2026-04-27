@@ -5,6 +5,7 @@ import {
     AlureOutlet,
     useAlure,
     withFixedPosition,
+    withPortal,
 } from "./index.tsx";
 import "@testing-library/jest-dom";
 import type { PropsWithChildren } from "react";
@@ -148,13 +149,28 @@ describe("Alure", () => {
                             withFixedPosition({
                                 top: 100,
                                 left: 100,
+                                testid: "middleware:fixed-position",
                             }),
                         ],
                     });
                 });
-                expect(screen.getByTestId("alure:middleware:fixed-position").style.top).toEqual("100px");
-                expect(screen.getByTestId("alure:middleware:fixed-position").style.left).toEqual("100px");
-                expect(screen.getByTestId("alure:middleware:fixed-position").style.position).toEqual("fixed");
+                expect(screen.getByTestId("middleware:fixed-position").style.top).toEqual("100px");
+                expect(screen.getByTestId("middleware:fixed-position").style.left).toEqual("100px");
+                expect(screen.getByTestId("middleware:fixed-position").style.position).toEqual("fixed");
+            });
+        });
+
+        describe("withPortal", () => {
+            it("should display content in the document", () => {
+                act(() =>{
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withPortal(),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("test-element")).toBeInTheDocument();
             });
         });
     });

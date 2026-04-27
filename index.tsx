@@ -6,7 +6,7 @@ import {
     useCallback,
     Fragment,
 } from "react";
-// import { createPortal } from "react-dom";
+import { createPortal } from "react-dom";
 import type {
     JSX,
     ElementType,
@@ -139,6 +139,7 @@ export const withFixedPosition = (
         left: number | string;
         className?: string;
         style?: CSSProperties;
+        testid?: string;
     },
 ): AlureMiddleware => {
     return {
@@ -150,10 +151,23 @@ export const withFixedPosition = (
                 ...options.style,
             };
             return (
-                <div data-testid="alure:middleware:fixed-position" className={options.className} style={style}>
+                <div data-testid={options.testid} className={options.className} style={style}>
                     {props.children}
                 </div>
             );
+        },
+    };
+};
+
+// @description middleware to display the floating element in a portal
+export const withPortal = (
+    options?: {
+        target?: HTMLElement,
+    },
+): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            return createPortal([<>{props.children}</>], options?.target ?? document.body);
         },
     };
 };
