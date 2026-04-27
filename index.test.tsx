@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { render, screen, act } from "@testing-library/react";
 import { AlureProvider, AlureOutlet, useAlure } from "./index.tsx";
 import "@testing-library/jest-dom";
+import type { PropsWithChildren } from "react";
 
 const TestComponent = () => {
     return (
@@ -94,6 +95,41 @@ describe("Alure", () => {
                     alureManager.open("test-id", {});
                 });
             }).toThrow("Cannot display alure element without 'component'");
+        });
+    });
+
+    describe("middlewares", () => {
+        let alureManager: any;
+
+        beforeEach(() => {
+            render(
+                <AlureProvider>
+                    <HookCaller onMount={(m) => { alureManager = m; }} />
+                    <AlureOutlet />
+                </AlureProvider>
+            );
+        });
+
+        it("should support adding custom middlewares", () => {
+            const customMiddleware = {
+                wrapper: (props: PropsWithChildren) => {
+                    return (
+                        <div data-testid="test-middleware">
+                            {props.children}
+                        </div>
+                    );
+                },
+            };
+
+            act(() => {
+                alureManager.open("text-id", {
+                    component: TestComponent,
+                    middlewares: [customMiddleware],
+                });
+            });
+
+            expect(screen.getByTestId("test-element")).toBeInTheDocument();
+            expect(screen.getByTestId("test-middleware")).toBeInTheDocument();
         });
     });
 });
