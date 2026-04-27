@@ -1,0 +1,8 @@
+# nodejs stuff
+node_modules
+package-lock.json
+yarn.lock
+
+# output files
+index.js
+index.d.ts

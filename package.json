@@ -1,0 +1,54 @@
+{
+    "name": "floator",
+    "version": "0.0.0",
+    "description": "Composable floating elements for React",
+    "author": {
+        "name": "Josemi Juanes",
+        "email": "hello@josemi.xyz"
+    },
+    "license": "MIT",
+    "repository": "https://github.com/jmjuanes/floator",
+    "bugs": "https://github.com/jmjuanes/floator/issues",
+    "type": "module",
+    "main": "index.js",
+    "types": "./index.d.ts",
+    "exports": {
+        ".": "./index.js",
+        "./index.js": "./index.js",
+        "./index.d.ts": "./index.d.ts",
+        "./package.json": "./package.json"
+    },
+    "scripts": {
+    },
+    "keywords": [
+        "react",
+        "floating",
+        "floating-ui",
+        "floating-elements"
+    ],
+    "files": [
+        "README.md",
+        "LICENSE",
+        "index.js",
+        "index.d.ts",
+        "package.json"
+    ],
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "@testing-library/dom": "^10.4.1",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "jest": "^30.3.0",
+        "jest-environment-jsdom": "^30.3.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "ts-jest": "^29.4.9",
+        "typescript": "^6.0.3"
+    },
+    "peerDependencies": {
+        "react": ">=18",
+        "react-dom": ">=18"
+    }
+}
