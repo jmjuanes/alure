@@ -197,3 +197,41 @@ export const withPortal = (
         },
     };
 };
+
+// @description middleware to display an overlay with the floating element
+export const withOverlay = (
+    options?: {
+        className?: string;
+        style?: CSSProperties;
+        testid?: string;
+        closeOnClick?: boolean;
+    },
+): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            const { close } = useAlure();
+            return (
+                <Fragment>
+                    <div
+                        data-testid={options?.testid}
+                        className={options?.className}
+                        style={{
+                            position: "fixed",
+                            width: "100%",
+                            height: "100%",
+                            top: "0",
+                            left: "0",
+                            ...options?.style,
+                        } as CSSProperties}
+                        onClick={() => {
+                            if (options?.closeOnClick) {
+                                close();
+                            }
+                        }}
+                    />
+                    {props.children}
+                </Fragment>
+            );
+        },
+    };
+};
