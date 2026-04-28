@@ -30,6 +30,7 @@ export type AlureMiddleware = {
 export type AlureElement = {
     id: string;
     component: ElementType;
+    context?: any;
     middlewares?: AlureMiddleware[];
 };
 
@@ -37,6 +38,7 @@ export type AlureManager = {
     open: (id: string, element: Partial<AlureElement>) => void;
     close: (id?: string) => void;
     closeAll: () => void;
+    getContext: () => any;
 };
 
 type AlureContextValue = {
@@ -53,6 +55,7 @@ const AlureElementContext = createContext<AlureElement | null>(null);
 // @returns {function} alure.close function to remove an alure element
 export const useAlure = (): AlureManager => {
     const context = useContext(AlureContext);
+    const elementContext = useContext(AlureElementContext);
     if (!context) {
         throw new Error("Cannot call 'useAlure' outside AlureProvider");
     }
@@ -67,7 +70,11 @@ export const useAlure = (): AlureManager => {
         setElements((prevElements: AlureElement[]) => {
             return [
                 ...prevElements,
-                Object.assign({}, element, { id: elementId }) as AlureElement,
+                {
+                    ...element,
+                    id: elementId,
+                    context: element?.context || {},
+                } as AlureElement,
             ];
         });
     }, [setElements]);
@@ -82,7 +89,16 @@ export const useAlure = (): AlureManager => {
     // callback to clear all alure elements
     const closeAll = useCallback(() => setElements(() => [] as AlureElement[]), [setElements]);
 
-    return { open, close, closeAll };
+    // callback to access to the context of the current element
+    // note that this method only works when using useAlure hook inside a floating element
+    const getContext = useCallback(() => {
+        if (!elementContext) {
+            throw new Error("Cannot call 'getContext' outside a floating element.");
+        }
+        return elementContext?.context || {};
+    }, [elementContext]);
+
+    return { open, close, closeAll, getContext };
 };
 
 // @description main component
@@ -162,12 +178,15 @@ export const withFixedPosition = (
 // @description middleware to display the floating element in a portal
 export const withPortal = (
     options?: {
+        key?: string;
         target?: HTMLElement,
     },
 ): AlureMiddleware => {
     return {
         wrapper: (props: PropsWithChildren): JSX.Element => {
-            return createPortal([<>{props.children}</>], options?.target ?? document.body);
+            return createPortal([
+                <Fragment key={options?.key ?? "alure:middleware:portal"}>{props.children}</Fragment>,
+            ], options?.target ?? document.body);
         },
     };
 };

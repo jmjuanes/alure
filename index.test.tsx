@@ -102,6 +102,26 @@ describe("Alure", () => {
                 });
             }).toThrow("Cannot display alure element without 'component'");
         });
+
+        it("should allow accessing to the context provided to a floating element", () => {
+            let elementManager: any;
+            let contextValue: any;
+            act(() => {
+                alureManager.open("test", {
+                    component: () => (
+                        <HookCaller onMount={m => elementManager = m} />
+                    ),
+                    context: {
+                        foo: "bar",
+                    },
+                });
+            });
+
+            act(() => {
+                contextValue = elementManager.getContext()?.foo;
+            });
+            expect(contextValue).toEqual("bar");
+        });
     });
 
     describe("middlewares", () => {
