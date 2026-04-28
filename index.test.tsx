@@ -1,11 +1,12 @@
 import { useEffect, Fragment } from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import {
     AlureProvider,
     AlureOutlet,
     useAlure,
     withFixedPosition,
     withPortal,
+    withOverlay,
 } from "./index.tsx";
 import "@testing-library/jest-dom";
 import type { PropsWithChildren } from "react";
@@ -211,6 +212,63 @@ describe("Alure", () => {
                     });
                 });
                 expect(screen.getByTestId("test-element")).toBeInTheDocument();
+            });
+        });
+
+        describe("withOverlay", () => {
+            it("should display an overlay element", () => {
+                act(() => {
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withOverlay({
+                                testid: "middleware:overlay",
+                            }),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("middleware:overlay")).toBeInTheDocument();
+                expect(screen.getByTestId("middleware:overlay").style.position).toEqual("fixed");
+            });
+
+            it("should allow to customize the overlay", () => {
+                act(() => {
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withOverlay({
+                                testid: "middleware:overlay",
+                                className: "test-css",
+                                style: {
+                                    backgroundColor: "red",
+                                },
+                            }),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("middleware:overlay")).toBeInTheDocument();
+                expect(screen.getByTestId("middleware:overlay").className).toEqual("test-css");
+                expect(screen.getByTestId("middleware:overlay").style.backgroundColor).toEqual("red");
+            });
+
+            it("should close the overlay when clicking on it", () => {
+                act(() => {
+                    alureManager.open("test-id", {
+                        component: TestComponent,
+                        middlewares: [
+                            withOverlay({
+                                testid: "middleware:overlay",
+                                closeOnClick: true,
+                            }),
+                        ],
+                    });
+                });
+                expect(screen.getByTestId("middleware:overlay")).toBeInTheDocument();
+
+                act(() => {
+                    fireEvent.click(screen.getByTestId("middleware:overlay"));
+                });
+                expect(screen.queryByTestId("middleware:overlay")).not.toBeInTheDocument();
             });
         });
     });
