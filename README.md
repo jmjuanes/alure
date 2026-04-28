@@ -1,8 +1,9 @@
 # alure
 
-A primitive for building and managing floating elements in React, powered by composable middlewares.
+> A primitive for building and managing floating elements in React, powered by composable middlewares.
 
-## What is alure?
+![npm version](https://badgen.net/npm/v/alure?labelColor=1d2734&color=21bf81)
+![license](https://badgen.net/github/license/jmjuanes/alure?labelColor=1d2734&color=21bf81)
 
 Alure provides a simple and flexible system to display floating elements: dialogs, context menus, command palettes, tooltips, or any UI element that appears on top of your application. Instead of managing visibility state and positioning logic scattered across your components, alure centralises everything in a single provider and lets you compose behaviour through middleware.
 
