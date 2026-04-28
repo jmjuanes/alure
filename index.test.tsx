@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Fragment } from "react";
 import { render, screen, act } from "@testing-library/react";
 import {
     AlureProvider,
@@ -121,6 +121,26 @@ describe("Alure", () => {
                 contextValue = elementManager.getContext()?.foo;
             });
             expect(contextValue).toEqual("bar");
+        });
+
+        it("should allow closing the floating element", () => {
+            let elementManager: any;
+            act(() => {
+                alureManager.open("test", {
+                    component: () => (
+                        <Fragment>
+                            <HookCaller onMount={m => elementManager = m} />
+                            <div>Floating Content</div>
+                        </Fragment>
+                    ),
+                });
+            });
+            expect(screen.getByText("Floating Content")).toBeInTheDocument();
+
+            act(() => {
+                elementManager.close();
+            });
+            expect(screen.queryByText("Floating Content")).not.toBeInTheDocument();
         });
     });
 
