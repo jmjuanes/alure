@@ -81,8 +81,15 @@ export const useAlure = (): AlureManager => {
 
     // callback to remove the provided alure element
     const close = useCallback((elementId?: string) => {
+        // 1. if the user is not calling this method with the ID and we are not inside a floating element
+        if (!elementId && !elementContext) {
+            throw new Error("Cannot call alure.close() without an id outside a floating element");
+        }
+        // 2. get the element ID to close.
+        // If the user has not called this method with an ID, use the current floating element id
+        const elementIdToClose = elementId || elementContext?.id;
         setElements((prevElements: AlureElement[]) => {
-            return prevElements.filter(element => element.id !== elementId);
+            return prevElements.filter(element => element.id !== elementIdToClose);
         });
     }, [setElements]);
 
