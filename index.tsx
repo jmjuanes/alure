@@ -5,6 +5,7 @@ import {
     useState,
     useCallback,
     Fragment,
+    useEffect,
 } from "react";
 import { createPortal } from "react-dom";
 import type {
@@ -232,6 +233,29 @@ export const withOverlay = (
                     {props.children}
                 </Fragment>
             );
+        },
+    };
+};
+
+// @description middleware to close the floating element when the Escape key is pressed
+export const withCloseOnEsc = (): AlureMiddleware => {
+    return {
+        wrapper: (props: PropsWithChildren): JSX.Element => {
+            const { close } = useAlure();
+            useEffect(() => {
+                const handleKeyDown = (event: KeyboardEvent) => {
+                    if (event.key === "Escape") {
+                        close();
+                    }
+                };
+                document.addEventListener("keydown", handleKeyDown);
+                return () => {
+                    document.removeEventListener("keydown", handleKeyDown);
+                };
+            }, [close]);
+            return (
+                <Fragment>{props.children}</Fragment>
+            )
         },
     };
 };

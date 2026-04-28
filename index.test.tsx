@@ -7,6 +7,7 @@ import {
     withFixedPosition,
     withPortal,
     withOverlay,
+    withCloseOnEsc,
 } from "./index.tsx";
 import "@testing-library/jest-dom";
 import type { PropsWithChildren } from "react";
@@ -269,6 +270,25 @@ describe("Alure", () => {
                     fireEvent.click(screen.getByTestId("middleware:overlay"));
                 });
                 expect(screen.queryByTestId("middleware:overlay")).not.toBeInTheDocument();
+            });
+        });
+
+        describe("withCloseOnEsc", () => {
+            it("should close the floating element when the Escape key is pressed", () => {
+                act(() => {
+                    alureManager.open("test", {
+                        component: TestComponent,
+                        middlewares: [
+                            withCloseOnEsc(),
+                        ],
+                    });
+                });
+                expect(screen.getByText("Floating Content")).toBeInTheDocument();
+
+                act(() => {
+                    fireEvent.keyDown(screen.getByText("Floating Content"), { key: "Escape" });
+                });
+                expect(screen.queryByText("Floating Content")).not.toBeInTheDocument();
             });
         });
     });
