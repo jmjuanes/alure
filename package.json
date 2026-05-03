@@ -1,6 +1,6 @@
 {
     "name": "alure",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "Composable floating elements for React",
     "author": {
         "name": "Josemi Juanes",
