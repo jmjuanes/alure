@@ -244,7 +244,7 @@ export const withOverlay = (
 };
 
 // @description middleware to close the floating element when the Escape key is pressed
-export const withCloseOnEsc = (): AlureMiddleware => {
+export const withDismiss = (): AlureMiddleware => {
     return {
         wrapper: (props: PropsWithChildren): JSX.Element => {
             const { close } = useAlure();
