@@ -7,7 +7,7 @@ import {
     withFixedPosition,
     withPortal,
     withOverlay,
-    withCloseOnEsc,
+    withDismiss,
 } from "./index.tsx";
 import "@testing-library/jest-dom";
 import type { PropsWithChildren } from "react";
@@ -294,13 +294,13 @@ describe("Alure", () => {
             });
         });
 
-        describe("withCloseOnEsc", () => {
+        describe("withDismiss", () => {
             it("should close the floating element when the Escape key is pressed", () => {
                 act(() => {
                     alureManager.open("test", {
                         component: TestComponent,
                         middlewares: [
-                            withCloseOnEsc(),
+                            withDismiss(),
                         ],
                     });
                 });
