@@ -65,10 +65,16 @@ export const useAlure = (): AlureManager => {
 
     // callback to show an alure element
     const open = useCallback((elementId: string, element: Partial<AlureElement>) => {
+        // 1. check if the component is provided
         if (!element.component) {
             throw new Error("Cannot display alure element without 'component'");
         }
         setElements((prevElements: AlureElement[]) => {
+            // 2. check if this element is already registered
+            if (prevElements.some((el: AlureElement) => el.id === elementId)) {
+                throw new Error(`There is a floating element alerady registered with the id '${elementId}'`);
+            }
+            // 3. register the new elements
             return [
                 ...prevElements,
                 {
