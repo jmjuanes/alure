@@ -144,6 +144,27 @@ describe("Alure", () => {
             });
             expect(screen.queryByText("Floating Content")).not.toBeInTheDocument();
         });
+
+        it("should throw an error when registering the same element", () => {
+            act(() => {
+                alureManager.open("test", {
+                    component: () => (
+                        <span>Floating Content</span>
+                    ),
+                });
+            });
+            expect(screen.getByText("Floating Content")).toBeInTheDocument();
+
+            expect(() => {
+                act(() => {
+                    alureManager.open("test", {
+                        component: () => (
+                            <span>Hello world</span>
+                        ),
+                    });
+                });
+            }).toThrow("There is a floating element alerady registered with the id 'test'");
+        });
     });
 
     describe("middlewares", () => {
