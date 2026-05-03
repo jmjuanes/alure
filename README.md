@@ -37,7 +37,7 @@ const App = () => (
 Then use the `useAlure` hook anywhere in your component tree to open and close floating elements:
 
 ```tsx
-import { useAlure, withOverlay, withCloseOnEsc } from "alure";
+import { useAlure, withOverlay, withDismiss } from "alure";
 import { MyDialog } from "./MyDialog";
 
 const OpenDialogButton = () => {
@@ -50,7 +50,7 @@ const OpenDialogButton = () => {
                 withOverlay({
                     closeOnClick: true,
                 }),
-                withCloseOnEsc(),
+                withDismiss(),
             ],
             context: {
                 title: "Hello from alure",
@@ -171,7 +171,7 @@ Renders the floating element inside a React portal, detaching it from the curren
 
 ```tsx
 import { useCallback } from "react";
-import { useAlure, withFixedPosition, withCloseOnEsc } from "alure";
+import { useAlure, withFixedPosition, withDismiss } from "alure";
 import { ContextMenu } from "./ContextMenu";
 
 const Canvas = () => {
@@ -186,7 +186,7 @@ const Canvas = () => {
                     top: event.clientY,
                     left: event.clientX,
                 }),
-                withCloseOnEsc(),
+                withDismiss(),
             ],
             context: {
                 position: {
@@ -206,7 +206,7 @@ const Canvas = () => {
 ### Dialog with overlay
 
 ```tsx
-import { useAlure, withOverlay, withCloseOnEsc } from "alure";
+import { useAlure, withOverlay, withDismiss } from "alure";
 import { ExportDialog } from "./ExportDialog";
 
 const ExportButton = () => {
@@ -217,7 +217,7 @@ const ExportButton = () => {
             component: ExportDialog,
             middlewares: [
                 withOverlay({ closeOnClick: true }),
-                withCloseOnEsc(),
+                withDismiss(),
             ],
         })}>
             Export
@@ -229,7 +229,7 @@ const ExportButton = () => {
 ### Command palette
 
 ```tsx
-import { useAlure, withCloseOnEsc } from "alure";
+import { useAlure, withDismiss } from "alure";
 import { CommandsPalette } from "./CommandsPalette";
 
 const useCommandsPalette = () => {
@@ -238,7 +238,9 @@ const useCommandsPalette = () => {
     return {
         openPalette: () => open("commands-palette", {
             component: CommandsPalette,
-            middlewares: [withCloseOnEsc()],
+            middlewares: [
+                withDismiss(),
+            ],
         }),
         closePalette: () => close("commands-palette"),
     };
