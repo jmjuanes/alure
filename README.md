@@ -152,7 +152,7 @@ Renders a full-screen overlay behind the floating element.
 | `className` | `string` | Optional CSS class for the overlay. |
 | `style` | `CSSProperties` | Optional additional inline styles. |
 
-#### `withCloseOnEsc()`
+#### `withDismiss()`
 
 Closes the floating element when the user presses the `Escape` key.
 
