@@ -33,6 +33,8 @@ export type AlureElement = {
     component: ElementType;
     context?: any;
     middlewares?: AlureMiddleware[];
+    onMount?: () => void;
+    onUnmount?: () => void;
 };
 
 export type AlureManager = {
@@ -133,6 +135,17 @@ const AlureElementWrapper = (props: { element: AlureElement }): JSX.Element => {
     const middlewaresComponents: ComponentType[] = (props.element.middlewares || [])
         .filter((middleware: AlureMiddleware) => !!middleware.wrapper)
         .map((middleware: AlureMiddleware) => middleware.wrapper as ComponentType);
+
+    useEffect(() => {
+        if (typeof props.element.onMount === "function") {
+            props.element.onMount();
+        }
+        return () => {
+            if (typeof props.element.onUnmount === "function") {
+                props.element.onUnmount();
+            }
+        };
+    }, []);
 
     return (
         <AlureElementContext.Provider value={props.element}>

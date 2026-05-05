@@ -114,6 +114,8 @@ Opens a floating element.
 | `element.component` | `ElementType` | The React component to render. Required. |
 | `element.middlewares` | `AlureMiddleware[]` | Optional array of middleware to compose behaviour. |
 | `element.context` | `any` | Optional data passed to the element, accessible via `getContext()`. |
+| `element.onMount` | `function` | Callback to be executed when the floating element is mounted. |
+| `element.onUnmount` | `function` | Callback to be executed when the floating element is removed. |
 
 #### `close(id?)`
 

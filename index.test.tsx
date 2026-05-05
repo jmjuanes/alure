@@ -165,6 +165,40 @@ describe("Alure", () => {
                 });
             }).toThrow("There is a floating element alerady registered with the id 'test'");
         });
+
+        it("should execute the onMount method when the floating element is mounted", () => {
+            const onMountListener = jest.fn();
+            act(() => {
+                alureManager.open("test", {
+                    component: () => (
+                        <span>Floating Element</span>
+                    ),
+                    onMount: onMountListener,
+                });
+            });
+
+            expect(screen.getByText("Floating Element")).toBeInTheDocument();
+            expect(onMountListener).toHaveBeenCalled();
+        });
+
+        it("should execute the onUnmount method when the floating element is removed", () => {
+            const onUnmountListener = jest.fn();
+            act(() => {
+                alureManager.open("test", {
+                    component: () => (
+                        <span>Floating Element</span>
+                    ),
+                    onUnmount: onUnmountListener,
+                });
+            });
+
+            expect(screen.getByText("Floating Element")).toBeInTheDocument();
+            act(() => {
+                alureManager.close("test");
+            });
+            expect(screen.queryByText("Floating Element")).not.toBeInTheDocument();
+            expect(onUnmountListener).toHaveBeenCalled();
+        });
     });
 
     describe("middlewares", () => {
